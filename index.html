@@ -6,6 +6,14 @@
     <title>Camp Compass AI - Smart Camping Navigation</title>
     <meta name="description" content="Transform paper campsite maps into intelligent GPS navigation. Find your pitch, locate amenities, and navigate like Google Maps for camping." />
     <meta name="author" content="Lovable" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Camp Compass" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/favicon.ico" />
 
     <meta property="og:title" content="camp-compass-ai" />
     <meta property="og:description" content="Lovable Generated Project" />
@@ -20,5 +28,20 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
