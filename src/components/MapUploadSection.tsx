@@ -11,13 +11,38 @@ export const MapUploadSection = () => {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    console.log("File selected:", file);
     if (file) {
+      // Check file type and size
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      
+      if (!validTypes.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select a JPG, PNG, or PDF file",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (file.size > maxSize) {
+        toast({
+          title: "File too large",
+          description: "Please select a file smaller than 10MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       setUploadedFile(file);
       toast({
         title: "Map uploaded successfully",
         description: "Ready to process with AI detection",
       });
     }
+    // Reset the input so the same file can be selected again if needed
+    event.target.value = '';
   };
 
   const handleCameraCapture = () => {
@@ -71,15 +96,17 @@ export const MapUploadSection = () => {
                 </p>
                 <input
                   type="file"
-                  accept="image/*,.pdf"
+                  accept="image/jpeg,image/png,image/jpg,application/pdf"
                   onChange={handleFileUpload}
                   className="hidden"
                   id="file-upload"
                 />
                 <label htmlFor="file-upload">
-                  <Button variant="outline" className="cursor-pointer">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Choose File
+                  <Button variant="outline" className="cursor-pointer" asChild>
+                    <span>
+                      <Upload className="w-4 h-4 mr-2" />
+                      Choose File
+                    </span>
                   </Button>
                 </label>
               </div>
