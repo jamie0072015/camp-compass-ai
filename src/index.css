@@ -8,33 +8,60 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Camping & Outdoor Theme Colors */
+    --background: 46 33% 97%; /* Warm cream/off-white */
+    --foreground: 150 15% 15%; /* Forest dark green */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 150 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 150 15% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Forest Green */
+    --primary: 142 76% 36%; /* Deep forest green */
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 142 60% 45%; /* Lighter forest green */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Earth Brown */
+    --secondary: 25 45% 85%; /* Light earth tone */
+    --secondary-foreground: 25 45% 25%; /* Dark brown */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted: Soft sage */
+    --muted: 120 20% 92%;
+    --muted-foreground: 120 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent: Sky blue for water/tech elements */
+    --accent: 200 85% 88%;
+    --accent-foreground: 200 85% 25%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 120 20% 85%;
+    --input: 120 20% 85%;
+    --ring: 142 76% 36%;
+
+    /* Camping-specific design tokens */
+    --forest-dark: 150 40% 25%;
+    --forest-light: 142 30% 75%;
+    --earth-warm: 25 55% 55%;
+    --sky-bright: 200 85% 65%;
+    --camp-orange: 20 85% 65%;
+    
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(200 85% 45%) 100%);
+    --gradient-forest: linear-gradient(180deg, hsl(142 30% 75%) 0%, hsl(142 76% 36%) 100%);
+    --gradient-earth: linear-gradient(135deg, hsl(25 55% 65%) 0%, hsl(25 45% 45%) 100%);
+    
+    /* Shadows with nature theme */
+    --shadow-soft: 0 4px 20px hsl(142 76% 36% / 0.1);
+    --shadow-strong: 0 8px 32px hsl(142 76% 36% / 0.15);
+    --shadow-gps: 0 0 20px hsl(200 85% 65% / 0.4);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --radius: 0.5rem;
 

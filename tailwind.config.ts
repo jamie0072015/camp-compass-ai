@@ -26,7 +26,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -52,7 +53,30 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
+				// Camping theme colors
+				forest: {
+					dark: 'hsl(var(--forest-dark))',
+					light: 'hsl(var(--forest-light))'
+				},
+				earth: 'hsl(var(--earth-warm))',
+				sky: 'hsl(var(--sky-bright))',
+				camp: 'hsl(var(--camp-orange))'
+			},
+			backgroundImage: {
+				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-forest': 'var(--gradient-forest)',
+				'gradient-earth': 'var(--gradient-earth)'
+			},
+			boxShadow: {
+				'soft': 'var(--shadow-soft)',
+				'strong': 'var(--shadow-strong)',
+				'gps': 'var(--shadow-gps)'
+			},
+			transitionTimingFunction: {
+				'smooth': 'var(--transition-smooth)',
+				'bounce': 'var(--transition-bounce)'
+			},
+			sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
 					primary: 'hsl(var(--sidebar-primary))',
