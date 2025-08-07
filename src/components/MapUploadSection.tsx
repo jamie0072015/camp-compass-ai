@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Upload, Camera, FileImage, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export const MapUploadSection = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -63,6 +65,10 @@ export const MapUploadSection = () => {
         title: "Map processed!",
         description: "AI detected 15 paths, 8 amenities, and 42 pitch numbers",
       });
+      // Navigate to map view after processing
+      setTimeout(() => {
+        navigate('/map');
+      }, 1500);
     }, 3000);
   };
 
