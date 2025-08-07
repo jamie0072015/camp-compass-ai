@@ -64,9 +64,8 @@ export const MapUploadSection = () => {
       
       // Upload the actual image to Supabase
       const { url } = await uploadMapImage(uploadedFile);
-      console.log("Image uploaded:", url);
+      console.log("Image uploaded successfully:", url);
       
-      setIsProcessing(false);
       toast({
         title: "Map uploaded successfully!",
         description: "Your map is ready for interactive viewing",
@@ -77,14 +76,27 @@ export const MapUploadSection = () => {
         navigate(`/map?imageUrl=${encodeURIComponent(url)}&fileName=${encodeURIComponent(uploadedFile.name)}`);
       }, 1000);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error("Upload error:", error);
-      setIsProcessing(false);
+      
+      let errorMessage = "Please try again";
+      if (error?.message?.includes('Failed to fetch')) {
+        errorMessage = "Network connection issue. Please check your internet and try again.";
+      } else if (error?.message?.includes('unauthorized')) {
+        errorMessage = "Permission denied. Please contact support.";
+      } else if (error?.message?.includes('payload too large')) {
+        errorMessage = "File too large. Please use a smaller image.";
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Upload failed",
-        description: "Please try again or check your connection",
+        description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
 

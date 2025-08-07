@@ -6,22 +6,51 @@ const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+// Create storage bucket if it doesn't exist
+export const createStorageBucket = async () => {
+  const { data: buckets } = await supabase.storage.listBuckets()
+  const bucketExists = buckets?.some(bucket => bucket.name === 'map-images')
+  
+  if (!bucketExists) {
+    const { error } = await supabase.storage.createBucket('map-images', {
+      public: true,
+      allowedMimeTypes: ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'],
+      fileSizeLimit: 10485760 // 10MB
+    })
+    if (error && !error.message.includes('already exists')) {
+      console.error('Error creating bucket:', error)
+    }
+  }
+}
+
 export const uploadMapImage = async (file: File) => {
-  const fileExt = file.name.split('.').pop()
-  const fileName = `${Math.random()}.${fileExt}`
-  const filePath = `maps/${fileName}`
+  try {
+    // Ensure bucket exists
+    await createStorageBucket()
+    
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+    const filePath = `maps/${fileName}`
 
-  const { data, error } = await supabase.storage
-    .from('map-images')
-    .upload(filePath, file)
+    const { data, error } = await supabase.storage
+      .from('map-images')
+      .upload(filePath, file, {
+        upsert: false,
+        cacheControl: '3600'
+      })
 
-  if (error) {
+    if (error) {
+      console.error('Storage upload error:', error)
+      throw new Error(`Upload failed: ${error.message}`)
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('map-images')
+      .getPublicUrl(filePath)
+
+    return { path: data.path, url: publicUrl }
+  } catch (error) {
+    console.error('Upload process error:', error)
     throw error
   }
-
-  const { data: { publicUrl } } = supabase.storage
-    .from('map-images')
-    .getPublicUrl(filePath)
-
-  return { path: data.path, url: publicUrl }
 }
