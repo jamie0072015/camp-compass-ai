@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Upload, Camera, FileImage, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { uploadMapImage } from "@/lib/supabase";
 
 export const MapUploadSection = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -54,22 +55,37 @@ export const MapUploadSection = () => {
     });
   };
 
-  const processMap = () => {
+  const processMap = async () => {
     if (!uploadedFile) return;
     
     setIsProcessing(true);
-    // Simulate AI processing
-    setTimeout(() => {
+    try {
+      console.log("Starting real map processing...");
+      
+      // Upload the actual image to Supabase
+      const { url } = await uploadMapImage(uploadedFile);
+      console.log("Image uploaded:", url);
+      
       setIsProcessing(false);
       toast({
-        title: "Map processed!",
-        description: "AI detected 15 paths, 8 amenities, and 42 pitch numbers",
+        title: "Map uploaded successfully!",
+        description: "Your map is ready for interactive viewing",
       });
-      // Navigate to map view after processing
+      
+      // Navigate to map view with the real image URL
       setTimeout(() => {
-        navigate('/map');
-      }, 1500);
-    }, 3000);
+        navigate(`/map?imageUrl=${encodeURIComponent(url)}&fileName=${encodeURIComponent(uploadedFile.name)}`);
+      }, 1000);
+      
+    } catch (error) {
+      console.error("Upload error:", error);
+      setIsProcessing(false);
+      toast({
+        title: "Upload failed",
+        description: "Please try again or check your connection",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

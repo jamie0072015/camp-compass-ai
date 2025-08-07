@@ -1,18 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, MapPin, Navigation, Zap } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft, MapPin, Navigation, Zap, ZoomIn, ZoomOut } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function MapView() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [mapPosition, setMapPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  
+  const imageUrl = searchParams.get('imageUrl');
+  const fileName = searchParams.get('fileName') || 'Uploaded Map';
+
+  useEffect(() => {
+    if (!imageUrl) {
+      navigate('/');
+    }
+  }, [imageUrl, navigate]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - mapPosition.x, y: e.clientY - mapPosition.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) {
+      setMapPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const zoomIn = () => setZoom(prev => Math.min(prev * 1.2, 3));
+  const zoomOut = () => setZoom(prev => Math.max(prev / 1.2, 0.5));
 
   const detectedFeatures = [
-    { id: 'paths', label: '15 Walking Paths', color: 'bg-camp', icon: Navigation },
-    { id: 'amenities', label: '8 Amenities', color: 'bg-sky', icon: MapPin },
-    { id: 'pitches', label: '42 Pitch Numbers', color: 'bg-primary-glow', icon: Zap },
+    { id: 'interactive', label: 'Interactive Map', color: 'bg-primary', icon: MapPin },
+    { id: 'zoom', label: 'Zoom & Pan', color: 'bg-camp', icon: ZoomIn },
+    { id: 'navigation', label: 'Touch Navigation', color: 'bg-sky', icon: Navigation },
   ];
+
+  if (!imageUrl) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-forest">
@@ -28,8 +67,8 @@ export default function MapView() {
             Back to Upload
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-white">Processed Campsite Map</h1>
-            <p className="text-white/80">AI detection complete - explore your interactive map</p>
+            <h1 className="text-3xl font-bold text-white">{fileName}</h1>
+            <p className="text-white/80">Interactive map view - zoom and pan to explore</p>
           </div>
         </div>
 
@@ -37,36 +76,51 @@ export default function MapView() {
           {/* Map Display */}
           <div className="lg:col-span-2">
             <Card className="p-4 bg-white/95 backdrop-blur-sm shadow-strong">
-              <div className="aspect-[4/3] bg-gradient-to-br from-green-50 to-green-100 rounded-lg relative overflow-hidden">
-                {/* Mock map with detected features */}
-                <div className="absolute inset-0 p-4">
-                  {/* Paths */}
-                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 300">
-                    <path d="M50 50 Q150 100 250 50 T350 100" stroke="#10b981" strokeWidth="3" fill="none" className="opacity-70" />
-                    <path d="M100 150 L300 150" stroke="#10b981" strokeWidth="3" fill="none" className="opacity-70" />
-                    <path d="M50 200 Q200 250 350 200" stroke="#10b981" strokeWidth="3" fill="none" className="opacity-70" />
-                  </svg>
-                  
-                  {/* Amenity markers */}
-                  <div className="absolute top-16 left-20 w-4 h-4 bg-sky rounded-full border-2 border-white shadow-lg animate-pulse" />
-                  <div className="absolute top-32 right-24 w-4 h-4 bg-sky rounded-full border-2 border-white shadow-lg animate-pulse" />
-                  <div className="absolute bottom-20 left-32 w-4 h-4 bg-sky rounded-full border-2 border-white shadow-lg animate-pulse" />
-                  
-                  {/* Pitch numbers */}
-                  <div className="absolute top-24 left-40 w-6 h-6 bg-primary-glow rounded text-xs font-bold text-white flex items-center justify-center shadow-lg">12</div>
-                  <div className="absolute top-40 left-60 w-6 h-6 bg-primary-glow rounded text-xs font-bold text-white flex items-center justify-center shadow-lg">24</div>
-                  <div className="absolute bottom-32 right-40 w-6 h-6 bg-primary-glow rounded text-xs font-bold text-white flex items-center justify-center shadow-lg">35</div>
-                  
-                  {/* Reception building */}
-                  <div className="absolute top-12 right-16 w-8 h-6 bg-earth rounded shadow-lg" />
-                  
-                  {/* Your location */}
-                  <div className="absolute bottom-16 left-16 w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow-lg animate-ping" />
+              <div className="aspect-[4/3] bg-gray-100 rounded-lg relative overflow-hidden cursor-move">
+                {/* Real uploaded map image */}
+                <div
+                  className="absolute inset-0 select-none"
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+                >
+                  <img
+                    src={imageUrl}
+                    alt="Uploaded map"
+                    className="w-full h-full object-contain transition-transform duration-200"
+                    style={{
+                      transform: `translate(${mapPosition.x}px, ${mapPosition.y}px) scale(${zoom})`,
+                      transformOrigin: 'center center'
+                    }}
+                    draggable={false}
+                  />
+                </div>
+                
+                {/* Zoom controls */}
+                <div className="absolute top-4 right-4 flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={zoomIn}
+                    className="bg-white/90 backdrop-blur-sm"
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={zoomOut}
+                    className="bg-white/90 backdrop-blur-sm"
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </Button>
                 </div>
                 
                 <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3">
                   <p className="text-sm font-medium">Interactive Map View</p>
-                  <p className="text-xs text-muted-foreground">Tap features to explore</p>
+                  <p className="text-xs text-muted-foreground">Drag to pan, use buttons to zoom</p>
                 </div>
               </div>
             </Card>
@@ -75,7 +129,7 @@ export default function MapView() {
           {/* Features Panel */}
           <div className="space-y-4">
             <Card className="p-6 bg-white/95 backdrop-blur-sm shadow-strong">
-              <h3 className="text-xl font-semibold mb-4">Detected Features</h3>
+              <h3 className="text-xl font-semibold mb-4">Map Features</h3>
               <div className="space-y-3">
                 {detectedFeatures.map((feature) => {
                   const Icon = feature.icon;
@@ -101,14 +155,23 @@ export default function MapView() {
             </Card>
 
             <Card className="p-6 bg-white/95 backdrop-blur-sm shadow-strong">
-              <h3 className="text-lg font-semibold mb-3">Navigation Ready</h3>
+              <h3 className="text-lg font-semibold mb-3">Map Controls</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Your map is now interactive and ready for offline navigation.
+                Your uploaded map is now viewable. Use zoom controls or pinch gestures to explore.
               </p>
-              <Button variant="camping" className="w-full">
-                <Navigation className="w-4 h-4 mr-2" />
-                Start Navigation
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={() => {setZoom(1); setMapPosition({x: 0, y: 0});}}
+                >
+                  Reset View
+                </Button>
+                <Button variant="camping" className="w-full">
+                  <Navigation className="w-4 h-4 mr-2" />
+                  Save Map
+                </Button>
+              </div>
             </Card>
           </div>
         </div>
